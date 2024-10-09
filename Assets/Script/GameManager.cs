@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GoodsManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     int money;
     int jelatine;
