@@ -2,11 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class JellyController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class JellyObject : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public Image img;
-    public float speed;
-    public float startWaitTime;
     public GameManager gameManager;
     private float waitTime;
     private int minX = -400, maxX = 400;
@@ -14,21 +12,21 @@ public class JellyController : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private Animator animator;
     private RectTransform rect;
     private Vector2 newPosition;
-    private int jelatine;
+    private Jelly jelly;
     private int level;
-    private int price;
+    public int sellPrice;
     private int exp;
     private int nextLvUp;
-    Vector2 posBeforeDrag;
+    private Vector2 posBeforeDrag;
     
     void Start()
     {
         rect = this.GetComponent<RectTransform>();
-        waitTime = startWaitTime;
+        waitTime = 5;
         animator = this.GetComponent<Animator>();
         newPosition = rect.anchoredPosition;
-        animator.SetFloat("speed", speed);
-        jelatine = 1;
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        animator.SetFloat("speed", jelly.speed);
         level = 1;
         exp = 0;
         nextLvUp = 5;
@@ -38,38 +36,54 @@ public class JellyController : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         animator.SetBool("walk", true);
         rect.anchoredPosition = Vector2.MoveTowards(rect.anchoredPosition,
-        newPosition, speed * Time.deltaTime);
+        newPosition, jelly.speed * Time.deltaTime);
         if (Vector2.Distance(rect.anchoredPosition, newPosition) < 0.1f)
         {
             animator.SetBool("walk", false);
             if (waitTime <= 0)
             {
                 newPosition = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
-                if(rect.anchoredPosition.x - newPosition.x > 0) {
-                    img.transform.localScale = new Vector3(-1, 1, 1);
-                }
-                else {
-                    img.transform.localScale = new Vector3(1, 1, 1);
-                }
-                waitTime = startWaitTime;
+                waitTime = 5;
             }
             else
             {
-                waitTime -= Time.deltaTime * Random.Range(0, startWaitTime);
+                waitTime -= Time.deltaTime * Random.Range(0, 5);
             }
+        }
+
+        this.transform.rotation = Quaternion.Euler(0, 0, 0);
+        if(rect.anchoredPosition.x - newPosition.x > 0) {
+            img.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else {
+            img.transform.localScale = new Vector3(1, 1, 1);
         }
 
     }
 
+    public void SetJellyObject(Jelly jelly, Sprite jellySprite) {
+        this.jelly = jelly;
+        this.img.sprite = jellySprite;
+        this.sellPrice = jelly.price / 2;
+    }
+
     public void OnClick() {
-        gameManager.setJelatine(gameManager.getJelatine() + this.jelatine);
-        exp++;
-        if(exp >= nextLvUp) {
-            level++;
-            //nextLvUp = //TODO: update number
-            exp = 0;
+        gameManager.setJelatine(gameManager.getJelatine() + this.jelly.jelatine);
+        if (level <= 5)
+        {
+            exp++;
+            if(exp >= nextLvUp) {
+                Debug.Log(jelly.name + "Level up");
+                level++;
+                rect.sizeDelta = new Vector2(rect.rect.width + 30, rect.rect.height + 30);
+                img.rectTransform.sizeDelta = rect.sizeDelta;
+                this.GetComponent<CapsuleCollider2D>().size = new Vector2(
+                    rect.rect.width + 30, rect.rect.height + 30);
+                nextLvUp += 1 * level; //TODO: change to 10
+                Debug.Log(nextLvUp);
+                exp = 0;
+            }
         }
-        Debug.Log("Clicked!");
     }
 
     public void OnBeginDrag(PointerEventData eventData)

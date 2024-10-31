@@ -12,9 +12,12 @@ public class GameManager : MonoBehaviour
 
     public Text moneyText;
     public Text jelatineText;
+    public GameObject canvas;
+    public GameObject jellyObjectPrefab;
+    public ShopManager shopManager;
     void Start()
     {
-        money = 0;
+        money = 10000;
         jelatine = 9999;
         setMoney(getMoney());
         setJelatine(getJelatine());
@@ -50,5 +53,30 @@ public class GameManager : MonoBehaviour
 
     public int getJelatine() {
         return this.jelatine;
+    }
+
+    public void AddJelly(int code) {
+        Jelly jellyType = shopManager.jellyItems[code].jelly;
+        GameObject newJelly = Instantiate(jellyObjectPrefab, canvas.transform);
+        newJelly.GetComponent<JellyObject>().SetJellyObject(jellyType, shopManager.jellySprites[code]);
+        if (jellyType.unit == 'J') {
+            if (this.jelatine - jellyType.price >= 0) {
+                setJelatine(this.jelatine - jellyType.price);
+                shopManager.shopWindow.SetActive(false);
+            }
+            //TODO: else
+        }
+        else {
+            if (this.money - jellyType.price >= 0) {
+                setMoney(this.money - jellyType.price);
+                shopManager.shopWindow.SetActive(false);
+            }
+            //TODO: else
+        }
+    }
+
+    public void SellJelly(GameObject jellyObj) {
+        setMoney(this.money + jellyObj.GetComponent<JellyObject>().sellPrice);
+        Destroy(jellyObj);
     }
 }

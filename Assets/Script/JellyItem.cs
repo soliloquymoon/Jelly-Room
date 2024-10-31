@@ -1,23 +1,22 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class JellyItem : MonoBehaviour
 {
-    Jelly jelly;
+    public Jelly jelly;
     public Image image;
     int code;
     public Text nameText;
     public Text descriptionText;
     public Text priceText;
     public Image priceUnitImage;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public GameManager gameManager;
+    public GameObject lockImage;
+    public ShopManager shopManager;
 
-    public void setItem(Jelly jelly, int code, Sprite jellySprite, Sprite unitIcon) {
+    public void SetItem(Jelly jelly, int code, Sprite jellySprite, Sprite unitIcon) {
         this.jelly = jelly;
         this.image.sprite = jellySprite;
         this.code = code;
@@ -25,9 +24,14 @@ public class JellyItem : MonoBehaviour
         this.descriptionText.text = jelly.jelatine + "<color=green>J</color> / click";
         this.priceUnitImage.sprite = unitIcon;
         this.priceText.text = jelly.price.ToString();
+        this.lockImage.SetActive(true);
     }
 
-    public void purchaseButton() {
-        Debug.Log(jelly.name);
+    public void PurchaseButton() {
+        shopManager.Purchase(code);
+    }
+
+    public void UnlockJelly() {
+        this.lockImage.SetActive(false);
     }
 }
