@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Project-Jelly-Farm.sln"
+    "dotnet.defaultSolution": "Jelly-Room.sln"
 }
